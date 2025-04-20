@@ -1,0 +1,30 @@
+import faiss
+import numpy as np
+import pickle
+from sentence_transformers import SentenceTransformer
+
+# Load embedding model
+model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+# Extract text from chunks
+texts = [chunk["text"] for chunk in section_chunks]
+
+# Generate embeddings
+embeddings = model.encode(texts, show_progress_bar=True)
+
+# Convert to float32 for FAISS
+embedding_array = np.array(embeddings).astype("float32")
+
+# Build FAISS index (cosine similarity using inner product + normalized vectors)
+index = faiss.IndexFlatIP(embedding_array.shape[1])
+faiss.normalize_L2(embedding_array)
+index.add(embedding_array)
+
+# Save FAISS index
+faiss.write_index(index, "faiss_index.index")
+
+# Save chunks
+with open("chunks.pkl", "wb") as f:
+    pickle.dump(section_chunks, f)
+
+print("✅ FAISS index and chunks saved successfully.")
