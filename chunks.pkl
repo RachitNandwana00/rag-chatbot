@@ -1,0 +1,50 @@
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from docx import Document
+
+# Load DOCX and parse sections
+def load_sections(filepath):
+    doc = Document(filepath)
+    sections = {}
+    current = None
+
+    for para in doc.paragraphs:
+        text = para.text.strip()
+        if not text:
+            continue
+        if text.endswith(":"):
+            current = text.rstrip(":")
+            sections[current] = []
+        else:
+            if current is None:
+                sections.setdefault("Introduction", []).append(text)
+            else:
+                sections[current].append(text)
+
+    return sections
+
+# Chunk sections
+def chunk_sections(sections, chunk_size=500, chunk_overlap=50):
+    splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    all_chunks = []
+
+    for section, paras in sections.items():
+        joined = "\n".join(paras)
+        chunks = splitter.split_text(joined)
+        for i, chunk in enumerate(chunks):
+            all_chunks.append({
+                "section": section,
+                "chunk_id": i,
+                "text": chunk
+            })
+
+    return all_chunks
+
+# Example usage
+file_path = "your_doc_path.docx"  # Replace with your actual doc path
+sections = load_sections(file_path)
+section_chunks = chunk_sections(sections)
+
+# Save chunks
+import pickle
+with open("chunks.pkl", "wb") as f:
+    pickle.dump(section_chunks, f)
