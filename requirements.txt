@@ -3,4 +3,6 @@ uvicorn
 faiss-cpu
 sentence-transformers
 numpy
-pydantic
+pandas
+scikit-learn
+python-docx
