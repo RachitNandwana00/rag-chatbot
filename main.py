@@ -6,6 +6,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi import Form
 
 # Load the embedding model
 model = SentenceTransformer("BAAI/bge-base-en-v1.5")
@@ -45,8 +46,7 @@ def home():
     """
 
 @app.post("/chat")
-def chat(request: QueryRequest):
-    query = request.query
+def chat(query: str = Form(...)):
     query_embedding = model.encode([query])
     D, I = index.search(np.array(query_embedding).astype("float32"), k=1)
 
