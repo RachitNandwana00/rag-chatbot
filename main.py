@@ -5,6 +5,7 @@ import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 # Load the embedding model
 model = SentenceTransformer("BAAI/bge-base-en-v1.5")
@@ -29,9 +30,19 @@ app.add_middleware(
 class QueryRequest(BaseModel):
     query: str
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
-    return {"message": "RAG Chatbot is running."}
+    return """
+    <html>
+        <body>
+            <h2>Chatbot</h2>
+            <form action="/chat" method="post">
+                <input type="text" name="query" placeholder="Ask your question here" required>
+                <button type="submit">Ask</button>
+            </form>
+        </body>
+    </html>
+    """
 
 @app.post("/chat")
 def chat(request: QueryRequest):
