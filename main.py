@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 
 # Load FAISS index and chunks
-index = faiss.read_index("faiss_index.index")
+index = faiss.read_index("faiss_index.faiss")
 with open("chunks.pkl", "rb") as f:
     chunks = pickle.load(f)
 
