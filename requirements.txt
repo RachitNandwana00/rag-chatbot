@@ -7,3 +7,4 @@ pandas
 scikit-learn
 python-docx
 python-multipart
+huggingface_hub[hf_xet]
